@@ -1,0 +1,19 @@
+#
+# Sample makefile for building sample reader.
+#
+
+#modiscodes= modisAOD2bufr.f90
+viirscodes= viirsAOD2bufr.f90
+
+FC = ifort
+LIBS = -L$(NETCDF)/lib -lnetcdf  -lnetcdff        #-L$(HDF5)/lib -lhdf5_hl -lhdf5
+libs = -L/home/Jack.Woollen/lib  -lbufr_4_64      # -lw3nco_v2.0.6_4 -lbacio_4 -lip_4 -lg2_4  -lw3nco_4 -ljasper -lpng -lz -lsp_4
+
+#modisAOD2bufr.x: $(modiscodes) 
+#	$(FC) -o modisAOD2bufr.x $(modiscodes) -I$(NETCDF)/include $(LIBS) $(libs)
+#	rm -f *.o
+
+
+viirsAOD2bufr.x: $(viirscodes) 
+	$(FC) -o viirsAOD2bufr.x $(viirscodes) -I$(NETCDF)/include $(LIBS) $(libs)
+	rm -f *.o

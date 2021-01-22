@@ -1,0 +1,46 @@
+#!/bin/ksh -l
+
+#SBATCH --partition=bigmem
+#SBATCH --mem=250g
+#SBATCH --ntasks=1
+#SBATCH --qos=batch  # partition bigmem: batch debug urgent 
+#SBATCH --time=3:00:00
+#SBATCH --account=zrtrr
+#SBATCH --job-name=AOD_prepbufr
+##SBATCH --output log.simulation
+
+set -euax
+
+make -f makefile_modis
+
+base=/scratch1/BMC/zrtrr/rli/WF1/AOD
+aod_nc=/scratch2/BMC/wrfruc/hwang/wf1/data/aod
+aod_prepbufr=${base}/Data/PrepBUFR
+exec=/scratch1/BMC/zrtrr/rli/WF1/AOD/AOD2BUFR/modisAOD2bufr.x
+
+yy=2019
+mm=08
+qc=00
+
+for dd in 06 #06 07 08 09 10
+do
+
+  day=${yy}${mm}${dd}
+  mkdir -p ${aod_prepbufr}/${day}
+  cd ${aod_prepbufr}/${day}
+  rm -f *
+
+  for hh in 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 #16 17 18 19 20 21 22 23
+  do
+    ln -sf ${base}/AOD2BUFR/modisAOD.table .
+    start_hr=s${day}${hh} 
+    nc_num=`ls ${aod_nc}/*${start_hr}*nc | wc -l`
+    if [[ ${nc_num}>0 ]]; then
+      ls  ${aod_nc}/*${start_hr}*nc > nc_list_${hh}
+      ${exec} ${hh} ${nc_num} ${qc}
+    fi
+  done
+
+done
+
+
